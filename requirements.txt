@@ -1,0 +1,10 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+sqlalchemy==2.0.30
+pymysql==1.1.0
+python-jobspy==1.1.72
+python-telegram-bot==21.3
+apscheduler==3.10.4
+pydantic-settings==2.2.1
+python-dotenv==1.0.1
+cryptography==42.0.7
