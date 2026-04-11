@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.mysql import insert
@@ -71,7 +71,8 @@ def run_scrape_for_user(db: Session, config: SearchConfig) -> list[Job]:
 def _upsert_job(db: Session, row) -> Optional[Job]:
     """
     Insert a job row if it doesn't already exist (deduplication via job_id + site).
-    Returns the Job ORM object if it was newly inserted, None if it was a duplicate.
+    Only accepts jobs posted within the last 24 hours.
+    Returns the Job ORM object if it was newly inserted, None if it was a duplicate or too old.
     """
     job_id = str(row.get("id", "")).strip()
     site   = str(row.get("site", "")).strip()
@@ -84,11 +85,18 @@ def _upsert_job(db: Session, row) -> Optional[Job]:
     if existing:
         return None
 
-    # Parse salary range
-    salary_min, salary_max, currency = _parse_salary(row)
-
     # Parse date posted
     date_posted = _parse_date(row.get("date_posted"))
+    
+    # Filter out jobs older than 24 hours
+    if date_posted:
+        cutoff_date = datetime.now().date() - timedelta(days=1)
+        if date_posted < cutoff_date:
+            logger.debug(f"Skipping job {job_id}@{site}: posted on {date_posted}, older than 24 hours")
+            return None
+
+    # Parse salary range
+    salary_min, salary_max, currency = _parse_salary(row)
 
     job = Job(
         job_id      = job_id,

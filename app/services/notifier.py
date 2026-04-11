@@ -66,7 +66,7 @@ def _format_digest(jobs: list[Job], remaining: int) -> str:
     header  = f"<b>{count} new job{'s' if count > 1 else ''} found</b>\n"
     divider = "─" * 30 + "\n"
 
-    lines = [header, divider]
+    lines = [header]
 
     for i, job in enumerate(jobs, start=1):
         title   = job.title   or "Untitled"

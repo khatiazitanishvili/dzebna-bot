@@ -5,12 +5,14 @@ Scrapes job boards (LinkedIn, Indeed, Glassdoor) and sends new job offers via Te
 
 ## Features
 
-- 🤖 Telegram bot for user registration and search configuration
-- 🔍 Automated job scraping from multiple job boards
-- 📬 Automatic notifications to users via Telegram
-- 🗄️ MySQL database to store jobs and user preferences
-- 🌐 FastAPI REST API for job management
-- ⏰ APScheduler for automated scrape cycles
+- Telegram bot for user registration and search configuration
+- Automated job scraping from multiple job boards
+- Automatic notifications to users via Telegram
+- Smart filtering: **only jobs posted in the last 24 hours**
+- MySQL database to store jobs and user preferences
+- FastAPI REST API for job management
+- APScheduler for automated scrape cycles
+- Real-time deduplication to prevent duplicate notifications
 
 ## Tech Stack
 
@@ -58,6 +60,34 @@ docker compose up --build
 
 Send `/start` to your bot on Telegram.
 
+### Notification Example
+
+The bot sends clean, formatted job notifications directly to your Telegram:
+
+<img src="assets/display_message_1.png" width="300" alt="Job notification showing new listings">
+<img src="assets/display_message_2.png" width="300" alt="Message from Dzebna bot">
+
+**Key Features:**
+- Fresh jobs only — Only jobs posted within the last 24 hours are sent
+- Direct links — Click to view the full job posting on the original board
+- Rich details — Company, location, salary range, and job type included
+- Push notifications — Receive alerts straight to your phone
+
+### Demo Video
+
+Watch the bot in action—automated scraping and real-time job notifications:
+
+<video width="300" controls>
+  <source src="assets/display_message_record.mov" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+**What the demo shows:**
+- User receives instant push notification when new job matches their search
+- Job card displays in lock screen with key details (position, company, location)
+- Users can tap to open the full job listing directly on the source board
+- All jobs shown are within the 24-hour window to ensure relevance
+
 ### Manual API Request
 
 ```bash
@@ -87,10 +117,17 @@ All settings are in `.env`:
 |----------|---------|---------|
 | `TELEGRAM_BOT_TOKEN` | Bot authentication token | required |
 | `DATABASE_URL` | MySQL connection string | `mysql+pymysql://...` |
-| `DEFAULT_SEARCH_TERM` | Default job search term | `software engineer` |
+| `DEFAULT_SEARCH_TERM` | Default job search term | `engineer` |
 | `DEFAULT_LOCATION` | Default job location | `Berlin, Germany` |
 | `DEFAULT_RESULTS_WANTED` | Results per scrape | `20` |
-| `NOTIFY_INTERVAL_MINUTES` | Scheduler interval | `1` |
+| Age filter: Only jobs posted within the last 24 hours are stored and sent
+- Deduplication: Each job is stored once per board to prevent duplicate notifications
+- Active configs
+
+The scraper automatically filters jobs:
+- **Age filter**: Only jobs posted within the last 24 hours are stored and sent
+- **Deduplication**: Each job is stored once per board to prevent duplicate notifications
+- **Active configs**: Only active search configs are processed during scheduled runs
 
 ## Project Structure
 
